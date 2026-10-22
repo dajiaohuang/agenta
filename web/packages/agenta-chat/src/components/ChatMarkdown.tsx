@@ -30,6 +30,8 @@ import {
     type ThemeInput,
 } from "streamdown"
 
+import {ChatTable, ChatTableCell} from "./ChatTable"
+import type {HastNode as TableHastNode} from "./chatTableModel"
 import WebLinkPreview from "./LinkPreviewCard"
 
 /** Host-supplied renderer for a code span / relative href that may name an agent file. */
@@ -369,6 +371,19 @@ export const chatMarkdownComponents: Components = {
     ),
     p: Paragraph,
     li: ListItem,
+    table: ({node, children}) => (
+        <ChatTable node={node as TableHastNode | undefined}>{children}</ChatTable>
+    ),
+    th: ({node, style, children}) => (
+        <ChatTableCell as="th" node={node as TableHastNode | undefined} style={style}>
+            {children}
+        </ChatTableCell>
+    ),
+    td: ({node, style, children}) => (
+        <ChatTableCell as="td" node={node as TableHastNode | undefined} style={style}>
+            {children}
+        </ChatTableCell>
+    ),
 }
 
 /** Streamdown's own list, plus one plugin BEFORE its harden gate; the prop replaces the defaults. */
@@ -410,7 +425,7 @@ const code: CodeHighlighterPlugin = {
 /** KaTeX math ($…$ / $$…$$) + Shiki-highlighted fences; both tree-shaken plugin packages. */
 const MD_PLUGINS = {math, code}
 
-/** Copy button on fences; no per-table/mermaid chrome. */
+/** Copy button on fences; tables draw their own chrome (`ChatTable`), mermaid none. */
 const MD_CONTROLS = {code: {copy: true, download: false}, mermaid: false, table: false} as const
 
 export interface ChatMarkdownProps {
